@@ -1,25 +1,16 @@
-import {Command, flags} from '@oclif/command'
+import {Command} from '@oclif/command'
+import axios from 'axios'
 
 export default class Stars extends Command {
-  static description = 'describe the command here'
-
-  static flags = {
-    help: flags.help({char: 'h'}),
-    // flag with a value (-n, --name=VALUE)
-    name: flags.string({char: 'n', description: 'name to print'}),
-    // flag with no value (-f, --force)
-    force: flags.boolean({char: 'f'}),
-  }
-
-  static args = [{name: 'file'}]
-
+  static description = 'show the github stars on a repository'
+  static args = [{name: 'repository', required: true}]
   async run() {
-    const {args, flags} = this.parse(Stars)
-
-    const name = flags.name || 'world'
-    this.log(`hello ${name} from /home/ubuntu/workspace/src/commands/stars.ts`)
-    if (args.file && flags.force) {
-      this.log(`you input --force and --file: ${args.file}`)
+    const {args} = this.parse(Stars)
+    const {data:stargazers} = await axios.get(`https://api.github.com/repos/${args.repository}/stargazers`)
+    for ( let s of stargazers)
+    {
+      this.log(s.login)
     }
+    this.log(stargazers.length + 'stargazers on this repo...')
   }
 }
